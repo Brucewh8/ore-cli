@@ -24,7 +24,7 @@ const MIN_SOL_BALANCE: f64 = 0.005;
 
 const RPC_RETRIES: usize = 0;
 const _SIMULATION_RETRIES: usize = 4;
-const GATEWAY_RETRIES: usize = 150;
+const GATEWAY_RETRIES: usize = 30;
 const CONFIRM_RETRIES: usize = 8;
 
 const CONFIRM_DELAY: u64 = 500;
@@ -41,9 +41,15 @@ impl Miner {
         ixs: &[Instruction],
         compute_budget: ComputeBudget,
         skip_confirm: bool,
+        difficulty: u32,
     ) -> ClientResult<Signature> {
+        let client = if difficulty >=17 {
+            self.custom_rpc_client.clone()
+        } else {
+            self.rpc_client.clone()
+        };
         let signer = self.signer();
-        let client = self.rpc_client.clone();
+        // let client = self.rpc_client.clone();
         let fee_payer = self.fee_payer();
 
         // Return error, if balance is zero
@@ -61,10 +67,14 @@ impl Miner {
             }
         }
 
+        let static_fee = if difficulty < 20 {
+            2000
+        } else {
+            self.priority_fee.unwrap_or(0)
+        };
+      
         // Set compute unit price
-        final_ixs.push(ComputeBudgetInstruction::set_compute_unit_price(
-            self.priority_fee.unwrap_or(0),
-        ));
+        final_ixs.push(ComputeBudgetInstruction::set_compute_unit_price(static_fee));
 
         // Add in user instructions
         final_ixs.extend_from_slice(ixs);

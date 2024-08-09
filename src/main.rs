@@ -34,6 +34,7 @@ struct Miner {
     pub dynamic_fee_url: Option<String>,
     pub dynamic_fee: bool,
     pub rpc_client: Arc<RpcClient>,
+    pub custom_rpc_client: Arc<RpcClient>,
     pub fee_payer_filepath: Option<String>,
 }
 
@@ -154,13 +155,16 @@ async fn main() {
     };
 
     // Initialize miner.
-    let cluster = args.rpc.unwrap_or(cli_config.json_rpc_url);
+    let cluster = cli_config.json_rpc_url.clone();
+    let custom_cluster = args.rpc.unwrap_or(cli_config.json_rpc_url);
     let default_keypair = args.keypair.unwrap_or(cli_config.keypair_path.clone());
     let fee_payer_filepath = args.fee_payer.unwrap_or(default_keypair.clone());
     let rpc_client = RpcClient::new_with_commitment(cluster, CommitmentConfig::confirmed());
+    let custom_rpc_client = RpcClient::new_with_commitment(custom_cluster, CommitmentConfig::confirmed());
 
     let miner = Arc::new(Miner::new(
         Arc::new(rpc_client),
+        Arc::new(custom_rpc_client),
         args.priority_fee,
         Some(default_keypair),
         args.dynamic_fee_url,
@@ -213,6 +217,7 @@ async fn main() {
 impl Miner {
     pub fn new(
         rpc_client: Arc<RpcClient>,
+        custom_rpc_client: Arc<RpcClient>,
         priority_fee: Option<u64>,
         keypair_filepath: Option<String>,
         dynamic_fee_url: Option<String>,
@@ -221,6 +226,7 @@ impl Miner {
     ) -> Self {
         Self {
             rpc_client,
+            custom_rpc_client,
             keypair_filepath,
             priority_fee,
             dynamic_fee_url,
