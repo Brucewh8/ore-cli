@@ -1,15 +1,13 @@
-# ORE CLI
+# ORE CLI v2.1_mod
 
 A command line interface for ORE cryptocurrency mining.
+
+##
+小玩家的极致节省需求，低难度时使用低gas，使用公共RPC；高难度时加高gas，使用自定义RPC。
 
 ## Install
 
 To install the CLI, use [cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html):
-
-```sh
-cargo install ore-cli
-```
-
 
 ### Dependencies
 If you run into issues during installation, please install the following dependencies for your operating system and try again:
