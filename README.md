@@ -2,7 +2,7 @@
 
 A command line interface for ORE cryptocurrency mining.
 
-##
+## 修改
 小玩家的极致节省需求，低难度时使用低gas，使用公共RPC；高难度时加高gas，使用自定义RPC。
 
 ## Install
